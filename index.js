@@ -19,10 +19,12 @@ const urlDatabase = {};
 let urlCounter = 1;
 
 function isValidUrl(userInput) {
-  return Promise.resolve(userInput)
-    .then((input) => new URL(input))
-    .then((url) => url.protocol === "http:" || url.protocol === "https:")
-    .catch(() => false);
+  try {
+    const url = new URL(userInput);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch (err) {
+    return false;
+  }
 }
 
 app.use(express.urlencoded());
@@ -30,7 +32,7 @@ app.use(express.urlencoded());
 // Post endpoint to create short URL
 app.post("/api/shorturl", (req, res) => {
   const original_url = req.body.url;
-  
+
   if (!isValidUrl(original_url)) {
     return res.json({ error: "invalid url" });
   }
